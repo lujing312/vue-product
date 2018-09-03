@@ -4,16 +4,17 @@
         style="width:400px;background-color:#fff;padding:30px"
         class="login-form"
         label-position="top"
-        label-width="80px">
+        label-width="80px"
+        :model="formData">
         <h2>用户登录</h2>
         <el-form-item label="用户名">
-            <el-input></el-input>
+            <el-input v-model="formData.username"></el-input>
         </el-form-item>
         <el-form-item label="密码">
-            <el-input type="password"></el-input>
+            <el-input @keyup.enter.native="handleLogin" v-model="formData.password" type="password"></el-input>
         </el-form-item>
         <el-form-item  class="login-btn">
-            <el-button type="primary" style="width:100%">登录</el-button>
+            <el-button @click="handleLogin" type="primary" style="width:100%">登录</el-button>
         </el-form-item>
     </el-form>
 </div>
@@ -21,7 +22,34 @@
 
 <script>
 export default {
-
+    data(){
+        return{
+            formData:{
+                username:'',
+                password:''
+            }
+        }
+    },
+    methods:{
+        handleLogin(){
+        this.$http
+            .post('login',this.formData)
+            .then((response)=>{
+               const {meta:{msg,status}} = response.data;
+               if(status==200){
+                   this.$message.success(msg);
+                   sessionStorage.setItem('token',response.data.data.token);
+                   this.$router.push('/');
+               }else{
+                   this.$message.error(msg);
+               }
+            })
+            .catch((err)=>{
+                console.log(err);
+                
+            });
+        }
+    }
 };
 </script>
 
